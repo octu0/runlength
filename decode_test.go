@@ -40,6 +40,40 @@ func TestDecode(t *testing.T) {
 		if err != nil {
 			tt.Errorf("no error:%+v", err)
 		}
+		tt.Logf("%v", out.Bytes()) // [250 0]
+
+		if bytes.Equal(b, src) != true {
+			tt.Errorf("actual=%v", b)
+		}
+	})
+	t.Run("zero/255", func(tt *testing.T) {
+		src := bytes.Repeat([]byte{0}, 255)
+		out := bytes.NewBuffer(nil)
+		if err := NewEncoder(out).Encode(src); err != nil {
+			tt.Errorf("no error:%+v", err)
+		}
+		b, err := NewDecoder().Decode(bytes.NewReader(out.Bytes()))
+		if err != nil {
+			tt.Errorf("no error:%+v", err)
+		}
+		tt.Logf("%v", out.Bytes()) // [255 0]
+
+		if bytes.Equal(b, src) != true {
+			tt.Errorf("actual=%v", b)
+		}
+	})
+	t.Run("zero/256", func(tt *testing.T) {
+		src := bytes.Repeat([]byte{0}, 256)
+		out := bytes.NewBuffer(nil)
+		if err := NewEncoder(out).Encode(src); err != nil {
+			tt.Errorf("no error:%+v", err)
+		}
+		b, err := NewDecoder().Decode(bytes.NewReader(out.Bytes()))
+		if err != nil {
+			tt.Errorf("no error:%+v", err)
+		}
+		tt.Logf("%v", out.Bytes()) // [255 0 1 0]
+
 		if bytes.Equal(b, src) != true {
 			tt.Errorf("actual=%v", b)
 		}

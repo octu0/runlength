@@ -11,25 +11,22 @@ type Encoder struct {
 }
 
 func (e *Encoder) Encode(data []byte) error {
+	if len(data) < 1 {
+		return nil
+	}
+
 	currentValue := data[0]
 	currentLength := byte(1)
 
 	for i := 1; i < len(data); i += 1 {
-		out := true
-		if currentValue == data[i] {
-			out = false
-			currentLength += 1
-			if 255 <= currentLength {
-				out = true
-			}
-		}
-
-		if out {
+		if data[i] != currentValue || currentLength == 255 {
 			if _, err := e.out.Write([]byte{currentLength, currentValue}); err != nil {
-				return errors.Wrapf(err, "failed to write data:%d %v", currentLength, currentValue)
+				return errors.Wrapf(err, "failed to write data: len=%d, val=%v", currentLength, currentValue)
 			}
-			currentLength = 1
 			currentValue = data[i]
+			currentLength = 1
+		} else {
+			currentLength += 1
 		}
 	}
 	if _, err := e.out.Write([]byte{currentLength, currentValue}); err != nil {
