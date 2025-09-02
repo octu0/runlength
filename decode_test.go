@@ -30,4 +30,18 @@ func TestDecode(t *testing.T) {
 			tt.Errorf("actual=%v", b)
 		}
 	})
+	t.Run("zero/250", func(tt *testing.T) {
+		src := bytes.Repeat([]byte{0}, 250)
+		out := bytes.NewBuffer(nil)
+		if err := NewEncoder(out).Encode(src); err != nil {
+			tt.Errorf("no error:%+v", err)
+		}
+		b, err := NewDecoder().Decode(bytes.NewReader(out.Bytes()))
+		if err != nil {
+			tt.Errorf("no error:%+v", err)
+		}
+		if bytes.Equal(b, src) != true {
+			tt.Errorf("actual=%v", b)
+		}
+	})
 }
